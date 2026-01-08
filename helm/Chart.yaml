@@ -1,0 +1,5 @@
+apiVersion: v2
+name: Taiga
+description: Helm chart for deploying Taiga with t8s
+version: 0.1.0
+appVersion: "6.6.0"

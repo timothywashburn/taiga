@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taiga-protected
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: taiga-protected
+  template:
+    metadata:
+      labels:
+        app: taiga-protected
+    spec:
+      containers:
+      - name: taiga-protected
+        image: {{ .Values.image.protected.name }}:{{ .Values.image.protected.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8003
+        envFrom:
+        - secretRef:
+            name: taiga-protected-secret
+        volumeMounts:
+        - name: taiga-media
+          mountPath: /taiga/media
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+      volumes:
+      - name: taiga-media
+        persistentVolumeClaim:
+          claimName: taiga-media-pvc

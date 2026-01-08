@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: taiga-media-pvc
+spec:
+  {{- if .Values.media.storage.volumeName }}
+  volumeName: {{ .Values.media.storage.volumeName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.media.storage.size }}

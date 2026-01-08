@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taiga-back
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: taiga-back
+  template:
+    metadata:
+      labels:
+        app: taiga-back
+    spec:
+      initContainers:
+      - name: collectstatic
+        image: {{ .Values.image.backend.name }}:{{ .Values.image.backend.tag }}
+        command:
+        - sh
+        - -c
+        - |
+          python manage.py collectstatic --noinput
+        envFrom:
+        - secretRef:
+            name: taiga-backend-secret
+        - configMapRef:
+            name: taiga-backend-config
+        volumeMounts:
+        - name: taiga-static
+          mountPath: /taiga-back/static
+      containers:
+      - name: taiga-back
+        image: {{ .Values.image.backend.name }}:{{ .Values.image.backend.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: taiga-backend-secret
+        - configMapRef:
+            name: taiga-backend-config
+        volumeMounts:
+        - name: taiga-media
+          mountPath: /taiga-back/media
+        - name: taiga-static
+          mountPath: /taiga-back/static
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: taiga-media
+        persistentVolumeClaim:
+          claimName: taiga-media-pvc
+      - name: taiga-static
+        persistentVolumeClaim:
+          claimName: taiga-static-pvc

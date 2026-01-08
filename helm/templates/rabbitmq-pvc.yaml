@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-pvc
+spec:
+  {{- if .Values.rabbitmq.storage.volumeName }}
+  volumeName: {{ .Values.rabbitmq.storage.volumeName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.rabbitmq.storage.size }}

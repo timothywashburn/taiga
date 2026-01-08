@@ -1,0 +1,57 @@
+ingress:
+  host:
+  ingressClassName: traefik
+
+taiga:
+  scheme: https
+  websocketsScheme: wss
+  publicRegisterEnabled: false
+  enableTelemetry: false
+  attachmentsMaxAge: 360
+
+  email:
+    backend: console # 'console' just logs to console, 'smtp' for smtp setup
+    host: ""
+    port: 587
+    user: ""
+    password: ""
+    defaultFrom: ""
+    useTLS: true
+    useSSL: false
+
+
+postgres:
+  user: taiga
+  database: taiga
+  storage:
+    volumeName: ""
+    size: 5Gi
+
+rabbitmq:
+  user: taiga
+  vhost: taiga
+  storage:
+    volumeName: ""
+    size: 512Mi
+
+media:
+  storage:
+    volumeName: ""
+    size: 1Gi
+
+image:
+  backend:
+    name: taigaio/taiga-back
+    tag: latest
+  frontend:
+    name: taigaio/taiga-front
+    tag: latest
+  events:
+    name: taigaio/taiga-events
+    tag: latest
+  protected:
+    name: taigaio/taiga-protected
+    tag: latest
+  gateway:
+    name: nginx
+    tag: 1.25-alpine

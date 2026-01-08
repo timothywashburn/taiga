@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: taiga-gateway
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: taiga-gateway
+  template:
+    metadata:
+      labels:
+        app: taiga-gateway
+    spec:
+      containers:
+      - name: nginx
+        image: {{ .Values.image.gateway.name }}:{{ .Values.image.gateway.tag }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: nginx-config
+          mountPath: /etc/nginx/conf.d
+        - name: taiga-media
+          mountPath: /taiga/media
+          readOnly: true
+        - name: taiga-static
+          mountPath: /taiga/static
+          readOnly: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: taiga-gateway-config
+      - name: taiga-media
+        persistentVolumeClaim:
+          claimName: taiga-media-pvc
+      - name: taiga-static
+        persistentVolumeClaim:
+          claimName: taiga-static-pvc
