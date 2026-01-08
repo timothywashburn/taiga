@@ -9,7 +9,11 @@ data:
   TAIGA_SUBPATH: ""
   PUBLIC_REGISTER_ENABLED: {{ .Values.taiga.publicRegisterEnabled | quote }}
   ENABLE_TELEMETRY: {{ .Values.taiga.enableTelemetry | quote }}
-  EMAIL_BACKEND: {{ .Values.taiga.email.backend | quote }}
+  {{- if eq .Values.taiga.email.backend "console" }}
+  EMAIL_BACKEND: "django.core.mail.backends.console.EmailBackend"
+  {{- else if eq .Values.taiga.email.backend "smtp" }}
+  EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
+  {{- end }}
   {{- if eq .Values.taiga.email.backend "smtp" }}
   DEFAULT_FROM_EMAIL: {{ .Values.taiga.email.defaultFrom | quote }}
   EMAIL_HOST: {{ .Values.taiga.email.host | quote }}
