@@ -7,8 +7,8 @@ data:
   TAIGA_SITES_SCHEME: {{ .Values.taiga.scheme | quote }}
   TAIGA_SITES_DOMAIN: {{ .Values.ingress.host | quote }}
   TAIGA_SUBPATH: ""
-  PUBLIC_REGISTER_ENABLED: {{ .Values.taiga.publicRegisterEnabled | quote }}
-  ENABLE_TELEMETRY: {{ .Values.taiga.enableTelemetry | quote }}
+  PUBLIC_REGISTER_ENABLED: {{ .Values.taiga.publicRegisterEnabled | ternary "True" "False" | quote }}
+  ENABLE_TELEMETRY: {{ .Values.taiga.enableTelemetry | ternary "True" "False" | quote }}
   {{- if eq .Values.taiga.email.backend "console" }}
   EMAIL_BACKEND: "django.core.mail.backends.console.EmailBackend"
   {{- else if eq .Values.taiga.email.backend "smtp" }}
@@ -18,8 +18,8 @@ data:
   DEFAULT_FROM_EMAIL: {{ .Values.taiga.email.defaultFrom | quote }}
   EMAIL_HOST: {{ .Values.taiga.email.host | quote }}
   EMAIL_PORT: {{ .Values.taiga.email.port | quote }}
-  EMAIL_USE_TLS: {{ .Values.taiga.email.useTLS | quote }}
-  EMAIL_USE_SSL: {{ .Values.taiga.email.useSSL | quote }}
+  EMAIL_USE_TLS: {{ .Values.taiga.email.useTLS | ternary "True" "False" | quote }}
+  EMAIL_USE_SSL: {{ .Values.taiga.email.useSSL | ternary "True" "False" | quote }}
   {{- end }}
   EVENTS_PUSH_BACKEND: "taiga.events.backends.rabbitmq.EventsPushBackend"
   ATTACHMENTS_MAX_AGE: {{ .Values.taiga.attachmentsMaxAge | quote }}
