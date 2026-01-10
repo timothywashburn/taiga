@@ -56,6 +56,15 @@ data:
             proxy_set_header X-Scheme $scheme;
         }
 
+        location /media/attachments/ {
+            proxy_pass http://taiga-protected-service:8003/attachments/;
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Scheme $scheme;
+        }
+
         location /media/ {
             proxy_pass http://taiga-back-service:8000/media/;
             proxy_pass_header Server;
