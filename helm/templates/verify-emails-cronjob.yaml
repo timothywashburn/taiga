@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: taiga-verify-emails
+spec:
+  schedule: "* * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: verify-emails
+            image: postgres:15-alpine
+            command:
+            - sh
+            - -c
+            - |
+              PGPASSWORD="$POSTGRES_PASSWORD" psql -h postgres-service -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "UPDATE users_user SET verified_email = true WHERE verified_email = false;"
+            envFrom:
+            - secretRef:
+                name: taiga-backend-secret
